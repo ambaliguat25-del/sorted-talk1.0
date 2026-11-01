@@ -35,7 +35,6 @@
         Status: <span id="statusText" class="mic-active">Wala pa naka-join sa frequency</span>
     </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         let map, ws = null;
@@ -43,7 +42,6 @@
         let myMarker = null;
         let watchId = null;
         let mediaRecorder = null;
-        let audioChunks = [];
         let isConnected = false;
 
         function initMap() {
@@ -74,7 +72,7 @@
                     isConnected = true;
                     btn.textContent = "Leave";
                     btn.style.background = "#e74c3c";
-                    document.getElementById('statusText.textContent').innerText = "Naa na sa Frequency - Auto Mic Active";
+                    document.getElementById('statusText').innerText = "Naa na sa Frequency - Auto Mic Active";
                     startGPS();
                     startAutoMic();
                 };
@@ -86,11 +84,8 @@
                             if (data.type === 'location') {
                                 updateMapMarker(data.username, data.lat, data.lng);
                             }
-                        } catch (e) {
-                            // Basig audio base64 string
-                        }
+                        } catch (e) {}
                     } else {
-                        // Dawata ang audio blob gikan sa uban
                         const audioBlob = new Blob([event.data], { type: 'audio/webm' });
                         const audioUrl = URL.createObjectURL(audioBlob);
                         const audio = new Audio(audioUrl);
@@ -150,14 +145,12 @@
 
                 mediaRecorder.ondataavailable = event => {
                     if (event.data.size > 0 && ws && ws.readyState === WebSocket.OPEN) {
-                        ws.send(event.data); // I-send diretso ang audio chunk sa uban
+                        ws.send(event.data);
                     }
                 };
 
-                // Mag-rekord kada 1 ka segundo unya i-send dayon automatic
                 mediaRecorder.start(1000);
 
-                // I-restart ang recorder matag 1 segundo aron padayon ang stream
                 setInterval(() => {
                     if (isConnected && mediaRecorder && mediaRecorder.state === 'recording') {
                         mediaRecorder.stop();
