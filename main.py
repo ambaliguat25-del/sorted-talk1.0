@@ -40,7 +40,6 @@ manager = ChannelManager()
 
 @app.get("/", response_class=HTMLResponse)
 async def get(request: Request):
-    # Tamang pormat para sa pinakabagong bersyon ng Starlette
     return templates.TemplateResponse(request, "index.html", {})
 
 @app.websocket("/ws/{channel}/{username}")
