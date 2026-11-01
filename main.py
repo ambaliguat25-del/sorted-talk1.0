@@ -40,7 +40,8 @@ manager = ChannelManager()
 
 @app.get("/", response_class=HTMLResponse)
 async def get(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    # Tamang pormat para sa pinakabagong bersyon ng Starlette
+    return templates.TemplateResponse(request, "index.html", {})
 
 @app.websocket("/ws/{channel}/{username}")
 async def websocket_endpoint(websocket: WebSocket, channel: str, username: str):
@@ -48,7 +49,6 @@ async def websocket_endpoint(websocket: WebSocket, channel: str, username: str):
     
     try:
         while True:
-            # Dawata bisan unsa (text JSON para sa GPS o bytes para sa audio)
             message = await websocket.receive()
             
             if "text" in message:
@@ -60,7 +60,6 @@ async def websocket_endpoint(websocket: WebSocket, channel: str, username: str):
                 except:
                     pass
             elif "bytes" in message:
-                # Automatic audio streaming broadcast sa tanan sa channel
                 await manager.broadcast(channel, message["bytes"], websocket, is_bytes=True)
                 
     except WebSocketDisconnect:
